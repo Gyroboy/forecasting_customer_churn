@@ -230,38 +230,38 @@ def write_report(
     ]
 
     lines = [
-        "# EDA Report: Telco Customer Churn",
+        "# EDA-отчёт: прогнозирование оттока клиентов",
         "",
-        "## Dataset overview",
-        f"- Rows: {summary['rows']}",
-        f"- Original feature columns: {summary['columns']}",
-        f"- Duplicate full rows: {summary['duplicate_rows']}",
-        f"- Duplicate `customerID`: {summary['duplicate_customer_id']}",
-        f"- Duplicate rows excluding `customerID`: {summary['duplicate_rows_excluding_customer_id']}",
+        "## Общая информация о датасете",
+        f"- Строк: {summary['rows']}",
+        f"- Исходных признаков: {summary['columns']}",
+        f"- Полных дубликатов строк: {summary['duplicate_rows']}",
+        f"- Дубликатов `customerID`: {summary['duplicate_customer_id']}",
+        f"- Дубликатов строк без учёта `customerID`: {summary['duplicate_rows_excluding_customer_id']}",
         "",
-        "## Data quality checks",
-        f"- Blank `TotalCharges` values: {summary['blank_total_charges']}",
-        f"- Missing `TotalCharges` after numeric cast: {summary['missing_total_charges_after_cast']}",
-        f"- `tenure = 0` and missing `TotalCharges`: {summary['tenure_zero_and_missing_total_charges']}",
-        f"- `tenure > 0` and missing `TotalCharges`: {summary['tenure_positive_and_missing_total_charges']}",
-        f"- Phone-service logical mismatches: {summary['phone_logic_mismatches']}",
-        f"- Internet-service logical mismatches: {sum(summary[key] for key in summary if key.endswith('_logic_mismatches') and key != 'phone_logic_mismatches')}",
+        "## Проверки качества данных",
+        f"- Пустых значений в `TotalCharges`: {summary['blank_total_charges']}",
+        f"- Пропусков в `TotalCharges` после перевода в число: {summary['missing_total_charges_after_cast']}",
+        f"- Случаев `tenure = 0` и пустого `TotalCharges`: {summary['tenure_zero_and_missing_total_charges']}",
+        f"- Случаев `tenure > 0` и пустого `TotalCharges`: {summary['tenure_positive_and_missing_total_charges']}",
+        f"- Логических несоответствий в телефонии: {summary['phone_logic_mismatches']}",
+        f"- Логических несоответствий в интернет-услугах: {sum(summary[key] for key in summary if key.endswith('_logic_mismatches') and key != 'phone_logic_mismatches')}",
         "",
-        "## Numeric sanity checks",
-        f"- `tenure` IQR outliers: {summary['tenure_iqr_outliers']} (bounds {summary['tenure_iqr_lower']:.2f} .. {summary['tenure_iqr_upper']:.2f})",
-        f"- `MonthlyCharges` IQR outliers: {summary['MonthlyCharges_iqr_outliers']} (bounds {summary['MonthlyCharges_iqr_lower']:.2f} .. {summary['MonthlyCharges_iqr_upper']:.2f})",
-        f"- `TotalCharges_num` IQR outliers: {summary['TotalCharges_num_iqr_outliers']} (bounds {summary['TotalCharges_num_iqr_lower']:.2f} .. {summary['TotalCharges_num_iqr_upper']:.2f})",
-        f"- `MonthlyCharges` p01/p99: {summary['MonthlyCharges_p01']:.2f} / {summary['MonthlyCharges_p99']:.2f}",
-        f"- `TotalCharges_num` p01/p99: {summary['TotalCharges_num_p01']:.2f} / {summary['TotalCharges_num_p99']:.2f}",
+        "## Проверки числовой корректности",
+        f"- Выбросов по IQR в `tenure`: {summary['tenure_iqr_outliers']} (границы {summary['tenure_iqr_lower']:.2f} .. {summary['tenure_iqr_upper']:.2f})",
+        f"- Выбросов по IQR в `MonthlyCharges`: {summary['MonthlyCharges_iqr_outliers']} (границы {summary['MonthlyCharges_iqr_lower']:.2f} .. {summary['MonthlyCharges_iqr_upper']:.2f})",
+        f"- Выбросов по IQR в `TotalCharges_num`: {summary['TotalCharges_num_iqr_outliers']} (границы {summary['TotalCharges_num_iqr_lower']:.2f} .. {summary['TotalCharges_num_iqr_upper']:.2f})",
+        f"- Перцентили p01/p99 для `MonthlyCharges`: {summary['MonthlyCharges_p01']:.2f} / {summary['MonthlyCharges_p99']:.2f}",
+        f"- Перцентили p01/p99 для `TotalCharges_num`: {summary['TotalCharges_num_p01']:.2f} / {summary['TotalCharges_num_p99']:.2f}",
         "",
-        "## Churn profiles",
+        "## Профили оттока",
     ]
 
     for feature, profile in profiles.items():
         churn_yes = profile[profile["Churn"] == "Yes"].copy()
         lines.append(f"### {feature}")
         for _, row in churn_yes.iterrows():
-            lines.append(f"- {row[feature]}: churn rate {row['share']:.2%}")
+            lines.append(f"- {row[feature]}: доля оттока {row['share']:.2%}")
         lines.append("")
 
     if not rare_categories.empty:
@@ -270,14 +270,14 @@ def write_report(
             rare_lines.append(f"| {row['feature']} | {row['category']} | {row['share']:.4f} |")
         rare_section = "\n".join(rare_lines)
     else:
-        rare_section = "No rare categories below threshold."
+        rare_section = "Редких категорий ниже заданного порога не найдено."
 
     lines.extend(
         [
-            "## Rare categories (<1%)",
+            "## Редкие категории (<1%)",
             rare_section,
             "",
-            "## Heuristics and recommendations",
+            "## Эвристики и рекомендации",
         ]
     )
     lines.extend([f"- {item}" for item in recommendations])
